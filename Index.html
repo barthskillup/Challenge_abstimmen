@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GROW with AI – Abstimmungstool</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--pink:#E8187A;--bg:#1C1C1C;--card:#242424;--border:#333;--text:#FFFFFF;--muted:#AAAAAA;--green:#2ECC71;--green-bg:#0D2B1A;--amber:#F5C800;--amber-bg:#2B2300;--red:#E74C3C;--red-bg:#2B0D0D}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif;min-height:100vh}
+.wrap{max-width:680px;margin:0 auto;padding:1.5rem 1rem 4rem}
+.hdr{margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid var(--pink)}
+.hdr-r1{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.brand{font-size:13px;color:var(--muted)}.brand b{color:var(--pink)}
+.badge{font-size:11px;padding:3px 8px;border-radius:99px;font-weight:500}
+.bmod{background:#3a0d1f;color:#f48fb1}.bvote{background:#0d1e3a;color:#90caf9}.bres{background:#0d2b1a;color:#a5d6a7}
+.lang-g{display:flex;gap:5px;margin-left:auto}
+.lb{font-size:12px;padding:3px 10px;border-radius:99px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-weight:500}
+.lb.on{background:var(--pink);color:#fff;border-color:var(--pink)}
+.hdr-title{font-size:17px;font-weight:500;line-height:1.3;margin-bottom:8px}
+.hdr-acts{display:flex;gap:6px}
+.sc{display:none}.sc.on{display:block}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;margin-bottom:12px}
+.stitle{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem}
+.ir{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.inum{font-size:13px;color:var(--muted);min-width:22px;text-align:right;flex-shrink:0}
+.itag{font-size:10px;padding:2px 6px;border-radius:99px;background:#3a0d1f;color:#f48fb1;flex-shrink:0}
+.itagw{background:#0d1e3a;color:#90caf9}
+.ii{flex:1;font-size:14px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:#2a2a2a;color:var(--text)}
+.ii:focus{outline:none;border-color:var(--pink)}
+.ii::placeholder{color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--text);transition:background .15s}
+.btn:hover{background:#333}
+.btnp{background:var(--pink);color:#fff;border-color:var(--pink)}.btnp:hover{background:#c5136a}
+.btnp:disabled{background:#444;border-color:#444;cursor:default;color:#666}
+.btnsm{padding:5px 10px;font-size:12px}
+.btnd{background:var(--red-bg);color:var(--red);border-color:var(--red)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem}
+.cr{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;border:1px solid var(--border);margin-bottom:8px;cursor:pointer;transition:background .1s}
+.cr:hover{background:#2a2a2a}
+.cr.sel{border-color:var(--pink);background:#2d0817}
+.cr input[type=checkbox]{width:18px;height:18px;accent-color:var(--pink);flex-shrink:0;margin-top:2px;cursor:pointer}
+.cr label{font-size:15px;cursor:pointer;line-height:1.4}
+.ctr-wrap{display:flex;align-items:center;gap:12px;margin-bottom:1rem;flex-wrap:wrap}
+.ctr{display:inline-flex;align-items:center;gap:6px;font-size:15px;color:var(--muted);padding:6px 14px;background:var(--card);border-radius:99px;border:1px solid var(--border)}
+.ctr strong{color:var(--pink);font-size:20px}
+.prog{flex:1;min-width:120px;height:6px;background:#333;border-radius:99px;overflow:hidden}
+.prog-bar{height:6px;background:var(--pink);border-radius:99px;transition:width .3s}
+.qbox{display:flex;gap:1.5rem;align-items:flex-start;flex-wrap:wrap}
+.qwrap{background:#fff;padding:8px;border-radius:8px;flex-shrink:0;min-width:144px;min-height:144px;display:flex;align-items:center;justify-content:center}
+.lbox{flex:1;min-width:200px}
+.url-edit{width:100%;font-size:12px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:#2a2a2a;color:var(--text);margin-bottom:8px;word-break:break-all}
+.url-edit:focus{outline:none;border-color:var(--pink)}
+.srow{display:flex;gap:12px;margin-bottom:1rem}
+.stat{background:#2a2a2a;border-radius:8px;padding:.75rem 1rem;flex:1;text-align:center}
+.statn{font-size:28px;font-weight:500}
+.statl{font-size:12px;color:var(--muted);margin-top:2px}
+.rrow{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.rrk{font-size:13px;color:var(--muted);min-width:22px;text-align:right;font-weight:500;flex-shrink:0}
+.rbw{flex:1;min-width:0}
+.rl{font-size:14px;margin-bottom:4px;line-height:1.3}
+.rbg{background:#2a2a2a;border-radius:99px;height:8px;overflow:hidden}
+.rb{height:8px;border-radius:99px;background:var(--pink);transition:width .8s ease}
+.rc{font-size:13px;font-weight:500;color:var(--pink);min-width:28px;text-align:right;flex-shrink:0}
+.msg{padding:.875rem 1rem;border-radius:8px;font-size:14px;margin-bottom:1rem;line-height:1.5}
+.minfo{background:#0d1e3a;color:#90caf9}
+.mok{background:var(--green-bg);color:var(--green)}
+.mwarn{background:var(--amber-bg);color:var(--amber)}
+.prow{display:flex;gap:8px;align-items:center;margin-bottom:1rem}
+.pin{width:100px;font-size:18px;letter-spacing:.2em;text-align:center;padding:8px;border:1px solid var(--border);border-radius:8px;background:#2a2a2a;color:var(--text)}
+.divd{height:1px;background:var(--border);margin:1rem 0}
+.conf{text-align:center;padding:2.5rem 1rem}
+.conficon{font-size:64px;color:var(--pink);margin-bottom:1rem}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted);margin-right:5px;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+.sep{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:6px 0 4px;border-top:1px solid var(--border);margin:4px 0}
+.num-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.num-label{font-size:14px;color:var(--muted)}
+.num-ctrl{display:flex;align-items:center;gap:8px}
+.num-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.num-btn:hover{background:#333}
+.num-val{font-size:22px;font-weight:500;min-width:32px;text-align:center;color:var(--pink)}
+.url-hint{font-size:11px;color:var(--muted);margin-bottom:6px;line-height:1.4}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="hdr-r1">
+      <div class="brand"><b>GROW</b> with AI</div>
+      <span id="mbadge" class="badge" style="display:none"></span>
+      <div class="lang-g">
+        <button class="lb on" id="btn-de" onclick="setLang('de')">DE</button>
+        <button class="lb" id="btn-en" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+    <div class="hdr-title" id="hdr-title"></div>
+    <div class="hdr-acts" id="hdr-acts" style="display:none">
+      <button class="btn btnsm" id="btn-home" onclick="goHome()" style="display:none">&#8962; <span data-t="btn_home"></span></button>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div id="sc-home" class="sc on">
+    <div class="card" id="home-status"></div>
+    <div class="row" style="margin-top:.5rem">
+      <button class="btn btnp" onclick="showPin()">&#128737; <span data-t="btn_mod"></span></button>
+      <button class="btn" id="btn-vote-h" onclick="enterVote()" style="display:none">&#10003; <span data-t="btn_vote"></span></button>
+      <button class="btn" id="btn-see-res" onclick="seeResults()" style="display:none">&#128202; <span data-t="btn_results"></span></button>
+    </div>
+  </div>
+
+  <!-- PIN -->
+  <div id="sc-pin" class="sc">
+    <div class="card">
+      <p class="stitle" data-t="pin_title"></p>
+      <div class="prow">
+        <input type="password" class="pin" id="pin-in" maxlength="6" placeholder="••••" oninput="document.getElementById('pin-ok').disabled=this.value.length<1" onkeydown="if(event.key==='Enter')checkPin()">
+        <button class="btn btnp" id="pin-ok" onclick="checkPin()" disabled>&#8594;</button>
+      </div>
+      <p id="pin-err" style="font-size:13px;color:var(--red);display:none" data-t="pin_wrong"></p>
+      <div class="divd"></div>
+      <p style="font-size:12px;color:var(--muted)" data-t="pin_hint"></p>
+    </div>
+    <button class="btn btnsm" onclick="goHome()">&#8592; <span data-t="btn_back"></span></button>
+  </div>
+
+  <!-- ADMIN SETUP -->
+  <div id="sc-admin" class="sc">
+    <!-- Vote count setting -->
+    <div class="card">
+      <p class="stitle" data-t="section_votes"></p>
+      <div class="num-row">
+        <span class="num-label" data-t="votes_per_person"></span>
+        <div class="num-ctrl">
+          <button class="num-btn" onclick="changeMax(-1)">&#8722;</button>
+          <div class="num-val" id="max-display">5</div>
+          <button class="num-btn" onclick="changeMax(1)">&#43;</button>
+        </div>
+      </div>
+    </div>
+    <!-- Ideas -->
+    <div class="card">
+      <p class="stitle" data-t="section_ideas"></p>
+      <div id="ideas-list"></div>
+      <button class="btn btnsm" id="btn-add" onclick="addSlot()" style="margin-top:8px">+ <span data-t="btn_add"></span></button>
+    </div>
+    <!-- PIN change -->
+    <div class="card">
+      <p class="stitle" data-t="section_pin"></p>
+      <div class="prow">
+        <input type="text" class="pin" id="new-pin" maxlength="6" placeholder="2026">
+        <button class="btn btnsm" onclick="savePin()">&#10003; <span data-t="btn_save"></span></button>
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn btnp" onclick="startVoting()">&#9654; <span data-t="btn_start"></span></button>
+      <button class="btn btnsm btnd" onclick="resetAll()">&#128465; <span data-t="btn_reset"></span></button>
+    </div>
+    <div id="admin-msg"></div>
+  </div>
+
+  <!-- ADMIN VOTING CONTROL -->
+  <div id="sc-av" class="sc">
+    <div class="card">
+      <div class="srow">
+        <div class="stat"><div class="statn" id="vc">0</div><div class="statl" data-t="votes_label"></div></div>
+        <div class="stat"><div class="statn" id="ic">0</div><div class="statl" data-t="ideas_label"></div></div>
+        <div class="stat"><div class="statn" id="mv-display">5</div><div class="statl" data-t="votes_per_person"></div></div>
+      </div>
+      <!-- QR + URL -->
+      <p class="stitle" data-t="link_label"></p>
+      <div class="qbox">
+        <div class="qwrap" id="qr-box"><span style="font-size:12px;color:#999;text-align:center" data-t="qr_loading"></span></div>
+        <div class="lbox">
+          <p class="url-hint" data-t="url_hint"></p>
+          <input type="text" class="url-edit" id="url-input" oninput="rebuildQR(this.value)" placeholder="https://...">
+          <div class="row" style="margin-bottom:0">
+            <button class="btn btnsm" onclick="copyLink()">&#128203; <span data-t="btn_copy"></span></button>
+            <button class="btn btnsm" onclick="detectUrl()">&#8635; <span data-t="btn_detect"></span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="margin-top:.5rem">
+      <button class="btn btnp" onclick="showResults(true)">&#128202; <span data-t="btn_results"></span></button>
+      <button class="btn btnsm" onclick="goAdmin()">&#9881; <span data-t="btn_settings"></span></button>
+    </div>
+  </div>
+
+  <!-- VOTE -->
+  <div id="sc-vote" class="sc">
+    <div class="msg minfo" id="vmsg"></div>
+    <div class="ctr-wrap">
+      <div class="ctr"><span data-t="selected_of"></span>&nbsp;<strong id="scnt">0</strong>&nbsp;/&nbsp;<span id="maxsel-lbl">5</span></div>
+      <div class="prog"><div class="prog-bar" id="prog-bar" style="width:0%"></div></div>
+    </div>
+    <div id="vote-ideas"></div>
+    <div class="row" style="margin-top:1rem">
+      <button class="btn btnp" id="btn-submit" onclick="submitVote()" disabled>&#10003; <span data-t="btn_submit"></span></button>
+    </div>
+  </div>
+
+  <!-- CONFIRMED -->
+  <div id="sc-conf" class="sc">
+    <div class="conf">
+      <div class="conficon">&#10004;</div>
+      <p style="font-size:20px;font-weight:500;margin-bottom:.5rem" data-t="confirmed_title"></p>
+      <p style="font-size:14px;color:var(--muted)" data-t="confirmed_text"></p>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="sc-res" class="sc">
+    <div class="card">
+      <div class="srow">
+        <div class="stat"><div class="statn" id="rv">0</div><div class="statl" data-t="total_votes"></div></div>
+        <div class="stat"><div class="statn" id="rp">0</div><div class="statl" data-t="total_voters"></div></div>
+      </div>
+      <p class="stitle" data-t="results_title"></p>
+      <div id="res-list"></div>
+    </div>
+    <div class="row" id="res-admin" style="display:none;margin-top:.5rem">
+      <button class="btn btnsm btnd" onclick="resetAll()">&#128465; <span data-t="btn_new"></span></button>
+      <button class="btn btnsm" onclick="goAdminVote()">&#8592; <span data-t="btn_back"></span></button>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+const SK='grow_v3_sess', VK='grow_v3_votes', DP='2026';
+const MAX_ID=20;
+const PRESET=['School of the Future','Climate Savers Wanted','Loneliness is a Thing of the Past','Fake or Fact?','Rethinking Work','Creative Despite AI','Health for All','Strengthening Democracy','Learning in Motion','Language with Impact'];
+
+// ── Storage ──────────────────────────────────────────────────
+function gs(){try{const v=localStorage.getItem(SK);return v?JSON.parse(v):null;}catch(e){return null;}}
+function ss(s){localStorage.setItem(SK,JSON.stringify(s));}
+function gv(){try{const v=localStorage.getItem(VK);return v?JSON.parse(v):{};}catch(e){return{};}}
+function sv(v){localStorage.setItem(VK,JSON.stringify(v));}
+function gid(){let id=localStorage.getItem('grow_v3_vid');if(!id){id='v_'+Math.random().toString(36).slice(2,11);localStorage.setItem('grow_v3_vid',id);}return id;}
+
+// ── Translations ─────────────────────────────────────────────
+const TXT={
+  de:{
+    hdr_title:'Wir wählen unsere Challenges für GROW with AI',
+    btn_mod:'Moderator',btn_vote:'Jetzt abstimmen',btn_back:'Zurück',btn_add:'Challenge hinzufügen',
+    btn_start:'Abstimmung starten',btn_reset:'Zurücksetzen',btn_results:'Ergebnisse anzeigen',
+    btn_settings:'Einstellungen',btn_save:'Speichern',btn_copy:'Link kopieren',btn_copied:'Kopiert!',
+    btn_new:'Neue Abstimmung',btn_submit:'Abstimmen',btn_home:'Start',btn_detect:'URL erkennen',
+    pin_title:'Moderator-PIN eingeben',pin_hint:'Standard-PIN: 2026',pin_wrong:'Falscher PIN – bitte nochmals versuchen',
+    section_votes:'Abstimmungsregeln',section_ideas:'Challenges bearbeiten (max. 20)',section_pin:'PIN ändern',
+    votes_per_person:'Stimmen pro Person',
+    link_label:'QR-Code & Link für Teilnehmende',
+    url_hint:'URL eingeben oder einfügen – der QR-Code wird automatisch aktualisiert. Wenn diese Datei auf GitHub Pages gehostet ist, auf "URL erkennen" klicken.',
+    qr_loading:'QR-Code wird generiert…',
+    votes_label:'Stimmen abgegeben',ideas_label:'Challenges',
+    selected_of:'Ausgewählt:',
+    all_selected:'<strong>%max Challenges ausgewählt.</strong> Jetzt abstimmen!',
+    confirmed_title:'Stimme abgegeben!',confirmed_text:'Danke für deine Stimme. Die Moderatorin zeigt die Ergebnisse, sobald alle abgestimmt haben.',
+    results_title:'Ergebnis – Ranking',total_votes:'Stimmen gesamt',total_voters:'Teilnehmende',
+    no_session:'Noch keine Abstimmung aktiv.',no_session_hint:'Moderator kann eine neue Abstimmung starten.',
+    voting_active:'Abstimmung läuft',voting_done:'Abstimmung abgeschlossen',
+    reset_confirm:'Alle Daten löschen und neu starten?',min_ideas:'Mindestens 2 Challenges eingeben.',pin_saved:'PIN gespeichert.',
+    tag_preset:'Kartenset',tag_ws:'Workshop',
+    sep_preset:'Challenges aus dem Kartenset',sep_ws:'Aus dem Workshop',
+    ph_preset:'Challenge aus dem Kartenset',ph_ws:'Challenge aus dem Workshop',
+    select_hint:'Wählt <strong>%max Challenges</strong>. Noch <strong>%n</strong> zu wählen.',
+    voted_already:'Du hast bereits abgestimmt.',
+  },
+  en:{
+    hdr_title:'Vote for your GROW with AI Challenges',
+    btn_mod:'Moderator',btn_vote:'Vote now',btn_back:'Back',btn_add:'Add challenge',
+    btn_start:'Start voting',btn_reset:'Reset',btn_results:'Show results',
+    btn_settings:'Settings',btn_save:'Save',btn_copy:'Copy link',btn_copied:'Copied!',
+    btn_new:'New vote',btn_submit:'Submit vote',btn_home:'Home',btn_detect:'Detect URL',
+    pin_title:'Enter moderator PIN',pin_hint:'Default PIN: 2026',pin_wrong:'Wrong PIN – please try again',
+    section_votes:'Voting rules',section_ideas:'Edit challenges (max. 20)',section_pin:'Change PIN',
+    votes_per_person:'Votes per person',
+    link_label:'QR code & link for participants',
+    url_hint:'Enter or paste the URL – the QR code updates automatically. If this file is hosted on GitHub Pages, click "Detect URL".',
+    qr_loading:'Generating QR code…',
+    votes_label:'Votes submitted',ideas_label:'Challenges',
+    selected_of:'Selected:',
+    all_selected:'<strong>%max challenges selected.</strong> Ready to submit!',
+    confirmed_title:'Vote submitted!',confirmed_text:'Thank you. The moderator will reveal the results once everyone has voted.',
+    results_title:'Results – Ranking',total_votes:'Total votes',total_voters:'Participants',
+    no_session:'No active vote session.',no_session_hint:'The moderator can start a new vote.',
+    voting_active:'Voting is open',voting_done:'Voting completed',
+    reset_confirm:'Delete all data and start over?',min_ideas:'Please enter at least 2 challenges.',pin_saved:'PIN saved.',
+    tag_preset:'Card set',tag_ws:'Workshop',
+    sep_preset:'Challenges from the card set',sep_ws:'Added during the workshop',
+    ph_preset:'Challenge from card set',ph_ws:'Challenge from workshop',
+    select_hint:'Choose <strong>%max challenges</strong>. <strong>%n</strong> left.',
+    voted_already:'You have already voted.',
+  }
+};
+
+let lang=localStorage.getItem('grow_lang')||'de';
+let isAdmin=false;
+let adminIdeas=[...PRESET];
+let adminMaxVotes=5;
+let selIdeas=new Set();
+let currentMaxVotes=5;
+
+function t(k){return TXT[lang][k]||k;}
+
+function setLang(l){
+  lang=l;
+  try{localStorage.setItem('grow_lang',l);}catch(e){}
+  document.getElementById('btn-de').className='lb'+(l==='de'?' on':'');
+  document.getElementById('btn-en').className='lb'+(l==='en'?' on':'');
+  applyT();
+  const cur=curSc();
+  if(cur==='admin')renderAdmin();
+  if(cur==='vote')updateSel();
+  if(cur==='home')refreshUI();
+}
+
+function applyT(){
+  document.getElementById('hdr-title').textContent=t('hdr_title');
+  document.querySelectorAll('[data-t]').forEach(el=>{
+    const v=t(el.getAttribute('data-t'));if(v)el.innerHTML=v;
+  });
+  const mb=document.getElementById('mbadge');
+  if(mb.style.display!=='none'){
+    const c=curSc();
+    if(c==='res')setBadge(t('btn_results'),'bres');
+    else if(isAdmin)setBadge(t('btn_mod'),'bmod');
+    else setBadge(t('btn_vote'),'bvote');
+  }
+}
+
+function curSc(){return document.querySelector('.sc.on')?.id?.replace('sc-','')||'';}
+function showSc(id){document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));document.getElementById('sc-'+id).classList.add('on');applyT();}
+function setBadge(txt,cls){const b=document.getElementById('mbadge');b.textContent=txt;b.className='badge '+cls;b.style.display=txt?'':'';}
+function showHA(home){const ha=document.getElementById('hdr-acts');ha.style.display=home?'flex':'none';document.getElementById('btn-home').style.display=home?'':'none';}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ── Home ─────────────────────────────────────────────────────
+function goHome(){isAdmin=false;setBadge('','');showHA(false);document.getElementById('btn-vote-h').style.display='none';document.getElementById('btn-see-res').style.display='none';showSc('home');refreshUI();}
+
+function refreshUI(){
+  const sess=gs(), votes=gv(), vid=gid();
+  const cur=curSc();
+  // Update home status
+  const el=document.getElementById('home-status');
+  if(!sess){
+    el.innerHTML=`<p style="font-size:14px;color:var(--muted)">${t('no_session')}</p><p style="font-size:13px;color:#555;margin-top:4px">${t('no_session_hint')}</p>`;
+    document.getElementById('btn-vote-h').style.display='none';
+    document.getElementById('btn-see-res').style.display='none';
+    return;
+  }
+  const vc=Object.keys(votes).length, ic=sess.ideas?.filter(i=>i).length||0, mv=sess.maxVotes||5;
+  if(sess.status==='voting'){
+    el.innerHTML=`<p style="font-size:14px;font-weight:500;margin-bottom:4px"><span class="dot"></span>${t('voting_active')}</p><p style="font-size:13px;color:var(--muted)">${ic} ${t('ideas_label')} · ${vc} ${t('votes_label')} · ${mv} ${t('votes_per_person')}</p>`;
+    document.getElementById('btn-vote-h').style.display='';
+    document.getElementById('btn-see-res').style.display='none';
+  } else if(sess.status==='results'){
+    el.innerHTML=`<p style="font-size:14px;font-weight:500;margin-bottom:4px">${t('voting_done')}</p><p style="font-size:13px;color:var(--muted)">${vc} ${t('total_votes')}</p>`;
+    document.getElementById('btn-vote-h').style.display='none';
+    document.getElementById('btn-see-res').style.display='';
+  }
+  if(cur==='av')updateAV(sess,votes);
+}
+
+function seeResults(){const sess=gs();if(!sess)return;renderResults(sess,gv(),false);showSc('res');showHA(true);}
+
+// ── PIN ───────────────────────────────────────────────────────
+function showPin(){showSc('pin');document.getElementById('pin-in').value='';document.getElementById('pin-err').style.display='none';document.getElementById('pin-ok').disabled=true;}
+
+function checkPin(){
+  const e=document.getElementById('pin-in').value, sess=gs();
+  if(e===(sess?.admin_pin||DP)){
+    isAdmin=true;document.getElementById('pin-err').style.display='none';
+    if(sess?.status==='voting')goAdminVote();
+    else if(sess?.status==='results'){renderResults(sess,gv(),true);showSc('res');document.getElementById('res-admin').style.display='flex';showHA(true);setBadge(t('btn_mod'),'bmod');}
+    else goAdmin();
+  }else{document.getElementById('pin-err').style.display='';}
+}
+
+// ── Admin setup ───────────────────────────────────────────────
+function goAdmin(){
+  isAdmin=true;setBadge(t('btn_mod'),'bmod');showHA(true);
+  const sess=gs();
+  adminIdeas=sess?.ideas?.length>0?[...sess.ideas]:[...PRESET];
+  adminMaxVotes=sess?.maxVotes||5;
+  document.getElementById('max-display').textContent=adminMaxVotes;
+  renderAdmin();showSc('admin');
+}
+
+function changeMax(d){
+  adminMaxVotes=Math.min(20,Math.max(1,adminMaxVotes+d));
+  document.getElementById('max-display').textContent=adminMaxVotes;
+}
+
+function renderAdmin(){
+  const list=document.getElementById('ideas-list');list.innerHTML='';
+  adminIdeas.forEach((idea,i)=>{
+    if(i===0){const s=document.createElement('div');s.className='sep';s.textContent=t('sep_preset');list.appendChild(s);}
+    if(i===PRESET.length){const s=document.createElement('div');s.className='sep';s.style.marginTop='8px';s.textContent=t('sep_ws');list.appendChild(s);}
+    const row=document.createElement('div');row.className='ir';
+    const isP=i<PRESET.length;
+    row.innerHTML=`<span class="inum">${i+1}.</span><span class="itag${isP?'':' itagw'}">${t(isP?'tag_preset':'tag_ws')}</span><input class="ii" type="text" value="${esc(idea)}" placeholder="${t(isP?'ph_preset':'ph_ws')}" oninput="adminIdeas[${i}]=this.value">`;
+    list.appendChild(row);
+  });
+  document.getElementById('btn-add').disabled=adminIdeas.length>=MAX_ID;
+}
+
+function addSlot(){if(adminIdeas.length>=MAX_ID)return;adminIdeas.push('');renderAdmin();setTimeout(()=>{const ins=document.querySelectorAll('.ii');if(ins.length)ins[ins.length-1].focus();},50);}
+
+function savePin(){
+  const np=document.getElementById('new-pin').value.trim()||DP;
+  const sess=gs()||{ideas:adminIdeas,status:'setup',admin_pin:DP,maxVotes:adminMaxVotes};
+  sess.admin_pin=np;ss(sess);
+  showMsg(t('pin_saved'),'ok');
+}
+
+function showMsg(txt,type='ok'){
+  const el=document.getElementById('admin-msg');
+  el.innerHTML=`<div class="msg m${type}" style="margin-top:8px">${txt}</div>`;
+  setTimeout(()=>{el.innerHTML='';},2500);
+}
+
+function startVoting(){
+  const ideas=adminIdeas.filter(i=>i.trim());
+  if(ideas.length<2){showMsg(t('min_ideas'),'warn');return;}
+  const sess=gs()||{admin_pin:DP};
+  ss({status:'voting',ideas,admin_pin:sess.admin_pin||DP,maxVotes:adminMaxVotes,created_at:Date.now()});
+  sv({});goAdminVote();
+}
+
+// ── Admin vote control ────────────────────────────────────────
+function goAdminVote(){
+  isAdmin=true;setBadge(t('btn_mod'),'bmod');showHA(true);
+  const sess=gs();const votes=gv();
+  updateAV(sess,votes);showSc('av');detectUrl();
+}
+
+function updateAV(sess,votes){
+  document.getElementById('vc').textContent=Object.keys(votes).length;
+  document.getElementById('ic').textContent=sess?.ideas?.filter(i=>i).length||0;
+  document.getElementById('mv-display').textContent=sess?.maxVotes||5;
+}
+
+// ── QR Code ───────────────────────────────────────────────────
+function detectUrl(){
+  let url='';
+  try{url=window.location.href;}catch(e){}
+  if(!url||url.startsWith('about:')||url.startsWith('blob:')){url='';}
+  document.getElementById('url-input').value=url;
+  rebuildQR(url);
+}
+
+function rebuildQR(url){
+  const box=document.getElementById('qr-box');box.innerHTML='';
+  if(!url||url.length<5){
+    box.innerHTML=`<span style="font-size:12px;color:#777;text-align:center;padding:8px">${t('qr_loading')}</span>`;
+    return;
+  }
+  try{
+    new QRCode(box,{text:url,width:128,height:128,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+  }catch(e){
+    box.innerHTML=`<span style="font-size:11px;color:#f48fb1;padding:8px;text-align:center">QR N/A</span>`;
+  }
+}
+
+function copyLink(){
+  const url=document.getElementById('url-input').value;
+  if(!url)return;
+  navigator.clipboard.writeText(url).then(()=>{
+    const btn=event.target.closest('button');const old=btn.innerHTML;
+    btn.innerHTML=`&#10003; ${t('btn_copied')}`;setTimeout(()=>{btn.innerHTML=old;},2000);
+  }).catch(()=>{
+    document.getElementById('url-input').select();document.execCommand('copy');
+  });
+}
+
+// ── Voting ────────────────────────────────────────────────────
+function enterVote(){
+  const vid=gid(), sess=gs();
+  if(!sess||sess.status!=='voting'){refreshUI();return;}
+  const votes=gv();
+  currentMaxVotes=sess.maxVotes||5;
+  setBadge(t('btn_vote'),'bvote');showHA(true);
+  if(votes[vid]){
+    showSc('conf');return;
+  }
+  selIdeas=new Set();
+  document.getElementById('maxsel-lbl').textContent=currentMaxVotes;
+  renderVoteIdeas(sess.ideas||[]);showSc('vote');updateSel();
+}
+
+function renderVoteIdeas(ideas){
+  const el=document.getElementById('vote-ideas');el.innerHTML='';
+  ideas.filter(i=>i).forEach((idea,i)=>{
+    const row=document.createElement('div');row.className='cr';row.id='cr-'+i;
+    row.innerHTML=`<input type="checkbox" id="cb-${i}" onchange="toggleI(${i})"><label for="cb-${i}">${esc(idea)}</label>`;
+    row.addEventListener('click',e=>{if(e.target.tagName!=='INPUT'&&e.target.tagName!=='LABEL')document.getElementById('cb-'+i).click();});
+    el.appendChild(row);
+  });
+}
+
+function toggleI(i){
+  const cb=document.getElementById('cb-'+i),row=document.getElementById('cr-'+i);
+  if(cb.checked){if(selIdeas.size>=currentMaxVotes){cb.checked=false;return;}selIdeas.add(i);row.classList.add('sel');}
+  else{selIdeas.delete(i);row.classList.remove('sel');}
+  updateSel();
+}
+
+function updateSel(){
+  const n=selIdeas.size, max=currentMaxVotes;
+  document.getElementById('scnt').textContent=n;
+  document.getElementById('maxsel-lbl').textContent=max;
+  document.getElementById('btn-submit').disabled=n!==max;
+  document.getElementById('prog-bar').style.width=Math.round((n/max)*100)+'%';
+  const msg=document.getElementById('vmsg');
+  if(n===max){msg.className='msg mok';msg.innerHTML=t('all_selected').replace(/%max/g,max);}
+  else{msg.className='msg minfo';msg.innerHTML=t('select_hint').replace(/%max/g,max).replace('%n',max-n);}
+}
+
+function submitVote(){
+  const vid=gid(), votes=gv();
+  if(votes[vid]){showSc('conf');return;}
+  votes[vid]=Array.from(selIdeas);sv(votes);showSc('conf');
+}
+
+// ── Results ───────────────────────────────────────────────────
+function showResults(fromAdmin=false){
+  const sess=gs();if(!sess)return;
+  sess.status='results';ss(sess);
+  const votes=gv();
+  renderResults(sess,votes,fromAdmin);showSc('res');showHA(true);
+  setBadge(t('btn_results'),'bres');
+  if(fromAdmin)document.getElementById('res-admin').style.display='flex';
+}
+
+function renderResults(sess,votes,adminView){
+  const ideas=sess.ideas||[];const totals={};
+  ideas.forEach((_,i)=>{totals[i]=0;});
+  Object.values(votes).forEach(sel=>{if(Array.isArray(sel))sel.forEach(i=>{if(totals[i]!==undefined)totals[i]++;});});
+  const sorted=ideas.map((idea,i)=>({idea,count:totals[i]||0})).filter(x=>x.idea).sort((a,b)=>b.count-a.count);
+  const maxV=sorted[0]?.count||1, totalVoters=Object.keys(votes).length, totalVotes=Object.values(totals).reduce((a,b)=>a+b,0);
+  document.getElementById('rv').textContent=totalVotes;
+  document.getElementById('rp').textContent=totalVoters;
+  const list=document.getElementById('res-list');list.innerHTML='';
+  sorted.forEach((item,rank)=>{
+    const pct=maxV>0?Math.round((item.count/maxV)*100):0;
+    const medal=rank===0?'🥇 ':rank===1?'🥈 ':rank===2?'🥉 ':'';
+    const row=document.createElement('div');row.className='rrow';
+    row.innerHTML=`<span class="rrk">${rank+1}.</span><div class="rbw"><div class="rl">${medal}${esc(item.idea)}</div><div class="rbg"><div class="rb" style="width:0%" data-p="${pct}"></div></div></div><span class="rc">${item.count}</span>`;
+    list.appendChild(row);
+  });
+  setTimeout(()=>{document.querySelectorAll('.rb[data-p]').forEach(b=>{b.style.width=b.dataset.p+'%';});},80);
+  setBadge(t('btn_results'),'bres');
+  if(adminView)document.getElementById('res-admin').style.display='flex';
+}
+
+function resetAll(){
+  if(!confirm(t('reset_confirm')))return;
+  localStorage.removeItem(SK);localStorage.removeItem(VK);
+  isAdmin=false;goHome();
+}
+
+// ── Init ──────────────────────────────────────────────────────
+window.addEventListener('load',()=>{applyT();refreshUI();});
+</script>
+</body>
+</html>
